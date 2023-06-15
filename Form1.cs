@@ -25,7 +25,7 @@ namespace L12Boss19
         Bitmap[] bmpRole = { new Bitmap(@"res\raiden.png"), new Bitmap(@"res\raiden_s.png") };
 
         ClassBoss boss = new ClassBoss();
-        int bosslife = 10;
+        int bosslife = 200;
         ClassPlane role = new ClassPlane();
         int roleCnt = 0;
         List<ClassBall> listBullet = new List<ClassBall>();
