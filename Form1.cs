@@ -32,6 +32,7 @@ namespace L12Boss19
 
         int playerHP = 20;
 
+        int bossWidth = 200;
         
         System.Media.SoundPlayer bgm = new System.Media.SoundPlayer(@"res\bgm.wav");
         private void Form1_Load(object sender, EventArgs e)
@@ -131,7 +132,7 @@ namespace L12Boss19
             ClassBall tmp = new ClassBall();
             tmp.clientSize = size;
             tmp.radius = 4;
-            tmp.position = role.position;
+            tmp.position = new Point(role.position.X+21,role.position.Y);
             tmp.velocity = new Point(0, 10);
             tmp.color = Color.Aqua;
             listBullet.Add(tmp);
@@ -144,7 +145,7 @@ namespace L12Boss19
             ClassBall tmp = new ClassBall();
             tmp.clientSize = size;
             tmp.radius = ballR;
-            tmp.position = boss.position;
+            tmp.position = new Point(boss.position.X + (bossWidth/2), boss.position.Y);
             tmp.velocity = new Point(v1, v2);
             tmp.color = Color.Orange;
             listBall.Add(tmp);
@@ -193,6 +194,7 @@ namespace L12Boss19
                         if ((bosslife % 10 == 0) && (bosslife >= 100))
                         {
                             boss.bkSize.Width = bosslife;
+                            bossWidth = bosslife;
                         }
 
 
@@ -255,15 +257,16 @@ namespace L12Boss19
             role.DrawImage(e.Graphics, bmpRole[roleCnt]);
             //文字
             Font font = new Font("微軟正黑體", 30);
-            Brush b = new SolidBrush(Color.Aqua);
-            e.Graphics.DrawString(bosslife.ToString(), font, b, new PointF(900, 20));
-            e.Graphics.DrawString(playerHP.ToString(), font, b, new PointF(20, 20));
+            Brush bBoss = new SolidBrush(Color.Brown); 
+            Brush bPlayer = new SolidBrush(Color.Aqua);
+            e.Graphics.DrawString(bosslife.ToString(), font, bBoss, new PointF(900, 20));
+            e.Graphics.DrawString(playerHP.ToString(), font, bPlayer, new PointF(20, 20));
 
             if (playerHP <= 0)
             {
                 font = new Font("微軟正黑體", 100);
-                b = new SolidBrush(Color.Red);
-                e.Graphics.DrawString("You Lose", font, b, new PointF(0, h / 2));
+                bPlayer = new SolidBrush(Color.Red);
+                e.Graphics.DrawString("You Lose", font, bPlayer, new PointF(0, h / 2));
                 timer.Enabled = false;
                 bgm.Stop();
             }
@@ -271,8 +274,8 @@ namespace L12Boss19
             if (bosslife <= 0)
             {
                 font = new Font("微軟正黑體", 100);
-                b = new SolidBrush(Color.Gold);
-                e.Graphics.DrawString("You Win", font, b, new PointF(0, h / 2));
+                bPlayer = new SolidBrush(Color.Gold);
+                e.Graphics.DrawString("You Win", font, bPlayer, new PointF(0, h / 2));
                 timer.Enabled = false;
                 bgm.Stop();
                 System.Media.SoundPlayer sp = new System.Media.SoundPlayer(@"res\win.wav");
