@@ -25,11 +25,15 @@ namespace L12Boss19
         Bitmap[] bmpRole = { new Bitmap(@"res\raiden.png"), new Bitmap(@"res\raiden_s.png") };
 
         ClassBoss boss = new ClassBoss();
-        int bosslife = 200;
+        int bosslife = 10;
         ClassPlane role = new ClassPlane();
         int roleCnt = 0;
         List<ClassBall> listBullet = new List<ClassBall>();
 
+        int playerHP = 20;
+
+        
+        System.Media.SoundPlayer bgm = new System.Media.SoundPlayer(@"res\bgm.wav");
         private void Form1_Load(object sender, EventArgs e)
         {
             size = new Size(w, h);
@@ -46,8 +50,9 @@ namespace L12Boss19
             this.DoubleBuffered = true;
             this.MouseClick += Form1_MouseClick;
             initialBar();
-            System.Media.SoundPlayer bgm = new System.Media.SoundPlayer(@"res\bgm.wav");
+            
             bgm.PlayLooping();
+            this.Text = "東方低配版 ～ the kockoff ver.";
         }
         private void initialBall()
         {
@@ -81,7 +86,7 @@ namespace L12Boss19
         private void initialBar()
         {
             //宣告a為具有strBk結構的結構陣列，大小為4
-            int bw = bosslife;
+            int bw = 200;
             int bh = 20;
             strBk[] a = new strBk[4];
             //dir=0 下 
@@ -128,7 +133,7 @@ namespace L12Boss19
             tmp.radius = 4;
             tmp.position = role.position;
             tmp.velocity = new Point(0, 10);
-            tmp.color = Color.Orange;
+            tmp.color = Color.Aqua;
             listBullet.Add(tmp);
         }
 
@@ -163,6 +168,7 @@ namespace L12Boss19
                     listBall[i].Move(role);
                     if (listBall[i].isCollision)
                     {
+                        playerHP -= 1;
                         listBall.Remove(listBall[i]);
                         roleCnt = 1;
                         break;
@@ -195,7 +201,7 @@ namespace L12Boss19
                 }
             }
             #endregion
-            this.Text = bosslife.ToString();
+            
             this.Invalidate();
         }
 
@@ -251,13 +257,26 @@ namespace L12Boss19
             Font font = new Font("微軟正黑體", 30);
             Brush b = new SolidBrush(Color.Aqua);
             e.Graphics.DrawString(bosslife.ToString(), font, b, new PointF(900, 20));
-            e.Graphics.DrawString(bosslife.ToString(), font, b, new PointF(20, 20));
-            if (bosslife <= 0)
+            e.Graphics.DrawString(playerHP.ToString(), font, b, new PointF(20, 20));
+
+            if (playerHP <= 0)
             {
                 font = new Font("微軟正黑體", 100);
                 b = new SolidBrush(Color.Red);
-                e.Graphics.DrawString("Game Over", font, b, new PointF(0, h / 2));
+                e.Graphics.DrawString("You Lose", font, b, new PointF(0, h / 2));
                 timer.Enabled = false;
+                bgm.Stop();
+            }
+
+            if (bosslife <= 0)
+            {
+                font = new Font("微軟正黑體", 100);
+                b = new SolidBrush(Color.Gold);
+                e.Graphics.DrawString("You Win", font, b, new PointF(0, h / 2));
+                timer.Enabled = false;
+                bgm.Stop();
+                System.Media.SoundPlayer sp = new System.Media.SoundPlayer(@"res\win.wav");
+                sp.Play();
             }
         }
 
