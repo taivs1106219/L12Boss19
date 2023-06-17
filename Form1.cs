@@ -21,22 +21,19 @@ namespace L12Boss19
         Point velocity;
         Color color;
         System.Windows.Forms.Timer timer;
+        System.Windows.Forms.Timer bulletTimer;
         Random r = new Random();
         List<ClassBall> listBall = new List<ClassBall>();
         int w = 1024, h = 768;
         Bitmap[] bmpRole = { new Bitmap(Resource1.raiden), new Bitmap(Resource1.raiden_s) };
-
         ClassBoss boss = new ClassBoss();
-        int bosslife = 200;
+        int bosslife = 400;
         ClassPlane role = new ClassPlane();
         int roleCnt = 0;
         List<ClassBall> listBullet = new List<ClassBall>();
-
         int playerHP = 20;
-
-        int bossWidth = 200;
-        
         System.Media.SoundPlayer bgm = new System.Media.SoundPlayer(Resource1.bgm);
+
         private void Form1_Load(object sender, EventArgs e)
         {
             size = new Size(w, h);
@@ -50,6 +47,10 @@ namespace L12Boss19
             timer.Tick += Timer_Tick;
             timer.Interval = 16;//60 FPS
             timer.Enabled = true;
+            bulletTimer = new System.Windows.Forms.Timer();
+            bulletTimer.Interval = 160;
+            bulletTimer.Tick += bulletTimer_Tick;
+            bulletTimer.Enabled = true;
             this.DoubleBuffered = true;
             this.MouseClick += Form1_MouseClick;
             initialBar();
@@ -125,7 +126,7 @@ namespace L12Boss19
             pos = new Point(e.X, e.Y);
             if (e.Button == MouseButtons.Left)
             {
-                initialBullet();
+                 initialBullet();
             }
         }
 
@@ -147,7 +148,7 @@ namespace L12Boss19
             ClassBall tmp = new ClassBall();
             tmp.clientSize = size;
             tmp.radius = ballR;
-            tmp.position = new Point(boss.position.X + (bossWidth/2), boss.position.Y);
+            tmp.position = new Point(boss.position.X + (boss.bkSize.Width/2), boss.position.Y);
             tmp.velocity = new Point(v1, v2);
             tmp.color = Color.Orange;
             listBall.Add(tmp);
@@ -193,10 +194,9 @@ namespace L12Boss19
                         listBullet.Remove(listBullet[i]);
                         bosslife -= 1;
 
-                        if ((bosslife % 10 == 0) && (bosslife >= 100))
+                        if ((bosslife % 20 == 0) && (bosslife >= 200))
                         {
-                            boss.bkSize.Width = bosslife;
-                            bossWidth = bosslife;
+                            boss.bkSize.Width = bosslife/2;
                         }
 
 
@@ -209,6 +209,10 @@ namespace L12Boss19
             this.Invalidate();
         }
 
+        private void bulletTimer_Tick(object sender,EventArgs e)
+        {
+            initialBullet();
+        }
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
             role.isMove = false;
@@ -280,7 +284,7 @@ namespace L12Boss19
                 e.Graphics.DrawString("You Win", font, bPlayer, new PointF(0, h / 2));
                 timer.Enabled = false;
                 bgm.Stop();
-                System.Media.SoundPlayer sp = new System.Media.SoundPlayer(@"res\win.wav");
+                System.Media.SoundPlayer sp = new System.Media.SoundPlayer(Resource1.win);
                 sp.Play();
             }
         }
