@@ -1,3 +1,5 @@
+using System.Runtime.Versioning;
+
 namespace L12Boss19
 {
     public partial class Form1 : Form
@@ -22,7 +24,7 @@ namespace L12Boss19
         Random r = new Random();
         List<ClassBall> listBall = new List<ClassBall>();
         int w = 1024, h = 768;
-        Bitmap[] bmpRole = { new Bitmap(@"res\raiden.png"), new Bitmap(@"res\raiden_s.png") };
+        Bitmap[] bmpRole = { new Bitmap(Resource1.raiden), new Bitmap(Resource1.raiden_s) };
 
         ClassBoss boss = new ClassBoss();
         int bosslife = 200;
@@ -34,7 +36,7 @@ namespace L12Boss19
 
         int bossWidth = 200;
         
-        System.Media.SoundPlayer bgm = new System.Media.SoundPlayer(@"res\bgm.wav");
+        System.Media.SoundPlayer bgm = new System.Media.SoundPlayer(Resource1.bgm);
         private void Form1_Load(object sender, EventArgs e)
         {
             size = new Size(w, h);
@@ -245,7 +247,7 @@ namespace L12Boss19
         {
             base.OnPaint(e);
             //­I´º
-            e.Graphics.DrawImage(new Bitmap(@"res\bg.jpg"), 0, 0);
+            e.Graphics.DrawImage(new Bitmap(Resource1.bg), 0, 0);
             //boss¤l¼u
             for (int i = 0; i < listBall.Count; i++)
                 listBall[i].Draw(e.Graphics);
