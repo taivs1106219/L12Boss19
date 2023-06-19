@@ -20,7 +20,7 @@ namespace L12Boss19
         Point pos;
         Point velocity;
         Color color;
-        System.Windows.Forms.Timer timer;
+        System.Windows.Forms.Timer mainTimer;
         System.Windows.Forms.Timer bulletTimer;
         Random r = new Random();
         List<ClassBall> listBall = new List<ClassBall>();
@@ -32,6 +32,7 @@ namespace L12Boss19
         int roleCnt = 0;
         List<ClassBall> listBullet = new List<ClassBall>();
         int playerHP = 20;
+        bool gameStarted = false;
         System.Media.SoundPlayer bgm = new System.Media.SoundPlayer(Resource1.bgm);
 
         private void Form1_Load(object sender, EventArgs e)
@@ -43,20 +44,18 @@ namespace L12Boss19
             velocity = new Point(10, 10);
             color = Color.Black;
             initialBall();
-            timer = new System.Windows.Forms.Timer();
-            timer.Tick += Timer_Tick;
-            timer.Interval = 16;//60 FPS
-            timer.Enabled = true;
+            mainTimer = new System.Windows.Forms.Timer();
+            mainTimer.Tick += Timer_Tick;
+            mainTimer.Interval = 16;//60 FPS
             bulletTimer = new System.Windows.Forms.Timer();
             bulletTimer.Interval = 160;
             bulletTimer.Tick += bulletTimer_Tick;
-            bulletTimer.Enabled = true;
             this.DoubleBuffered = true;
             this.MouseClick += Form1_MouseClick;
             initialBar();
-            
-            bgm.PlayLooping();
-            this.Text = "東方低配版 ～ the kockoff ver.";
+
+
+            this.Text = "東方低配版 ～ the kockoff ver.（點擊空白鍵開始）";
         }
         private void initialBall()
         {
@@ -126,7 +125,7 @@ namespace L12Boss19
             pos = new Point(e.X, e.Y);
             if (e.Button == MouseButtons.Left)
             {
-                 initialBullet();
+                initialBullet();
             }
         }
 
@@ -135,7 +134,7 @@ namespace L12Boss19
             ClassBall tmp = new ClassBall();
             tmp.clientSize = size;
             tmp.radius = 4;
-            tmp.position = new Point(role.position.X+21,role.position.Y);
+            tmp.position = new Point(role.position.X + 21, role.position.Y);
             tmp.velocity = new Point(0, 10);
             tmp.color = Color.Aqua;
             listBullet.Add(tmp);
@@ -148,7 +147,7 @@ namespace L12Boss19
             ClassBall tmp = new ClassBall();
             tmp.clientSize = size;
             tmp.radius = ballR;
-            tmp.position = new Point(boss.position.X + (boss.bkSize.Width/2), boss.position.Y);
+            tmp.position = new Point(boss.position.X + (boss.bkSize.Width / 2), boss.position.Y);
             tmp.velocity = new Point(v1, v2);
             tmp.color = Color.Orange;
             listBall.Add(tmp);
@@ -196,7 +195,7 @@ namespace L12Boss19
 
                         if ((bosslife % 20 == 0) && (bosslife >= 200))
                         {
-                            boss.bkSize.Width = bosslife/2;
+                            boss.bkSize.Width = bosslife / 2;
                         }
 
 
@@ -205,11 +204,11 @@ namespace L12Boss19
                 }
             }
             #endregion
-            
+
             this.Invalidate();
         }
 
-        private void bulletTimer_Tick(object sender,EventArgs e)
+        private void bulletTimer_Tick(object sender, EventArgs e)
         {
             initialBullet();
         }
@@ -242,10 +241,37 @@ namespace L12Boss19
                     role.dir = 4;
                     role.isMove = true;
                     break;
+                case Keys.Space:
+                    if (!gameStarted)
+                    {
+                        mainTimer.Enabled = true;
+                        bulletTimer.Enabled = true;
+                        bgm.PlayLooping();
+                        gameStarted = true;
+                        this.Text = "東方低配版 ～ the kockoff ver. (沒有回應)";
+                    }
+                    break;
             }
         }
 
-        
+
+        private void beforeRestart()
+        {
+            for (int i = 0; i < listBall.Count; i++)
+            {
+                listBall.Remove(listBall[i]);
+            }
+            for (int i = 0; i < listBullet.Count; i++)
+            {
+                listBullet.Remove(listBullet[i]);
+            }
+            mainTimer.Enabled = false;
+            bgm.Stop();
+            gameStarted = false;
+            playerHP = 20;
+            bosslife = 400;
+            this.Text = "東方低配版 ～ the kockoff ver.（點擊空白鍵重新開始）";
+        }
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -263,7 +289,7 @@ namespace L12Boss19
             role.DrawImage(e.Graphics, bmpRole[roleCnt]);
             //文字
             Font font = new Font("微軟正黑體", 30);
-            Brush bBoss = new SolidBrush(Color.Brown); 
+            Brush bBoss = new SolidBrush(Color.Brown);
             Brush bPlayer = new SolidBrush(Color.Aqua);
             e.Graphics.DrawString(bosslife.ToString(), font, bBoss, new PointF(900, 20));
             e.Graphics.DrawString(playerHP.ToString(), font, bPlayer, new PointF(20, 20));
@@ -272,18 +298,16 @@ namespace L12Boss19
             {
                 font = new Font("微軟正黑體", 100);
                 bPlayer = new SolidBrush(Color.Red);
+                beforeRestart();
                 e.Graphics.DrawString("You Lose", font, bPlayer, new PointF(0, h / 2));
-                timer.Enabled = false;
-                bgm.Stop();
             }
 
             if (bosslife <= 0)
             {
                 font = new Font("微軟正黑體", 100);
                 bPlayer = new SolidBrush(Color.Gold);
+                beforeRestart();
                 e.Graphics.DrawString("You Win", font, bPlayer, new PointF(0, h / 2));
-                timer.Enabled = false;
-                bgm.Stop();
                 System.Media.SoundPlayer sp = new System.Media.SoundPlayer(Resource1.win);
                 sp.Play();
             }
